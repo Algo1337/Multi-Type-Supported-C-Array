@@ -90,56 +90,37 @@ int main() {
 
 void set(Array *a, enum ArrayData_T dt, void *value) {
     if(a == NULL) return;
-    a->arr = (Element **)realloc(a->arr, sizeof(Element *) * (a->idx + 1));
-    Element *e = (Element *)malloc(sizeof(Element));
-    e->value = value;
-    e->typ = dt;
-    a->arr[a->idx++] = e;
+    a->arr              = (Element **)realloc(a->arr, sizeof(Element *) * (a->idx + 1));
+    Element *e          = (Element *)malloc(sizeof(Element));
+    e->value            = value;
+    e->typ              = dt;
+    a->arr[a->idx++]    = e;
 }
 
 void *get(Array *a, int idx) {
     if (idx >= a->idx || idx < 0) return NULL; // Check bounds
-
-    Element *element = a->arr[idx];
-    switch (element->typ) {
-        case _STRING:
-            return (char *)element->value;
-        case _INT:
-            return (int *)element->value;
-        case _LONG:
-            return (long *)element->value;
-        default:
-            return NULL;
-    }
+    return a->arr[idx]->value;
 }
 
 char *get_as_str(Array *a, int idx) {
     if (idx >= a->idx || idx < 0) return NULL; // Check bounds
 
     Element *e = a->arr[idx];
-    if(e->typ == _STRING) {
+    if(e->typ == _STRING)
         return (char *)e->value;
-    }
 
-    // Determine the required buffer size based on the maximum size of the converted value
-    int max_buffer_size = 100; // Adjust as needed
-    char *n = (char *)malloc(max_buffer_size);
-    if (n == NULL) {
-        // Handle memory allocation failure
+    char *n = (char *)malloc(100);
+    if (n == NULL)
         return NULL;
-    }
 
-    // Convert non-string types to strings
     switch (e->typ) {
         case _INT:
-            snprintf(n, max_buffer_size, "%d", *(int *)e->value);
+            snprintf(n, 100, "%d", *(int *)e->value);
             break;
         case _LONG:
-            snprintf(n, max_buffer_size, "%ld", *(long *)e->value);
+            snprintf(n, 100, "%ld", *(long *)e->value);
             break;
-        // Add cases for other non-string types if needed
         default:
-            // Handle unsupported type
             free(n);
             return NULL;
     }
